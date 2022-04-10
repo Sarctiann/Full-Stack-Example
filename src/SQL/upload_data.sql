@@ -1,0 +1,1 @@
+INSERT INTO cars (plate, model) VALUES (%s, %s);

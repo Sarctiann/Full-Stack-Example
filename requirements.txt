@@ -2,3 +2,4 @@ flask
 mysqlclient
 flask-mysqldb
 flask-redis
+flask-cors

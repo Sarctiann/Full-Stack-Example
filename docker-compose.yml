@@ -36,13 +36,14 @@ services:
         ports:
             - 3306:3306
         volumes:
-            - mysql_db:/var/lib/mysql:rw
-            - mysql_db_sock:/var/run/mysqld:rw
+            - ./mysql_db:/var/lib/mysql:rw
+            - mysql_db_sock:/var/run/mysqld
 
     redis:
         container_name: back_redis
         image: redis:alpine
         
+
 volumes:
     mysql_db: {}
-    mysql_db_sock: {}
+    mysql_db_sock:
