@@ -1,0 +1,10 @@
+# Folders
+
+__pycache__/
+
+mysql_db/
+mysql_db_sock/
+
+# Files
+
+TODO.html

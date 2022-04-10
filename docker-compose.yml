@@ -1,0 +1,48 @@
+# From https://docs.docker.com/compose/gettingstarted/
+
+# Version of Compose
+version: '3.9'
+
+# Configuration for the services (back and redis)
+services:
+    # This service builds the app from the Dockerfile
+    flask:
+        container_name: back_flask
+        # Current Dir
+        build: .
+        # Bind host:container port
+        ports:
+            - 5000:5000
+        # Add current dir as volume, and copy it to code dir
+        volumes:
+            - .:/code
+            - mysql_db_sock:/run/mysqld
+        # Extra environment variable
+        environment:
+            FLASK_ENV: development
+        # Run Redis ans MySQL first
+        depends_on:
+            - mysql
+            - redis
+
+    # Now the sevices
+    mysql:
+        container_name: back_mysql
+        image: mysql:8
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: pass123
+            MYSQL_DATABASE: test_project
+        ports:
+            - 3306:3306
+        volumes:
+            - mysql_db:/var/lib/mysql:rw
+            - mysql_db_sock:/var/run/mysqld:rw
+
+    redis:
+        container_name: back_redis
+        image: redis:alpine
+        
+volumes:
+    mysql_db: {}
+    mysql_db_sock: {}
