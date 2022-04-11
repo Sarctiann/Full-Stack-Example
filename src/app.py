@@ -1,8 +1,8 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 from src.extensions import mysql, redis
-from src.query_funcs import query, get_hit_count
+from src.query_funcs import query
 from src.test_data.upload_test_data import load_data
 
 
@@ -25,10 +25,19 @@ CORS(app)
     that would normally be used in a Flask project.
 """
 
-@app.route('/')
+@app.route('/get_car')
 def index():
-    count = get_hit_count()
-    return 'Hello World! I have been seen {} times.\n'.format(count)
+    plate = request.args.get('plate')
+    res = {}
+    if plate:
+        rowcount, (carmatch, *_) = query('get_car', (plate,))
+        if rowcount:
+            res['car'] = {
+                'id': carmatch[0],
+                'plate': carmatch[1],
+                'name': carmatch[2]
+            }
+    return jsonify(res)
 
 
 @app.route('/initialize')
@@ -43,3 +52,11 @@ def dbs():
     res['DATABASES'] = ', '.join([x[0] for x in query('show_dbs')])
     res['TABLES'] = ', '.join([x[0] for x in query('show_tables')])
     return jsonify(res)
+
+
+# SERVE FRONTEND
+@app.route('/')                         # CATCH ALL ROUTES
+@app.errorhandler(404)                  # ENABLE RACT ROUTES
+def serve(_=None):
+    # Discart error
+    return '<h1> No found for now</h1>'

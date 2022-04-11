@@ -13,8 +13,9 @@ def query(sql_file, params=None, many=False):
                 - params: to pass VALUES to the query
                 - many=True: to use "executemany"
         Returns: 
-            - without params: cursor fetched data
-            - with params:    cursor row count
+            - with params and many: cursor row count only
+            - with params:          tuple(cursor row count, cursor fetched data)
+            - without params:       cursor fetched data
     """
 
     retries = 5 
@@ -30,7 +31,7 @@ def query(sql_file, params=None, many=False):
                 elif params:
                     cur.execute(query.read(), params)
                     mysql.connection.commit()
-                    return cur.rowcount
+                    return cur.rowcount, cur.fetchall()
                 else:
                     cur.execute(query.read())
                     return cur.fetchall()
@@ -42,11 +43,23 @@ def query(sql_file, params=None, many=False):
             time.sleep(0.5)
 
 
-def get_hit_count():
+def redis_get(key):
     retries = 5 
     while True:
         try:
-            return redis.incr('hits')
+            return redis.get(key)
+        except Exception as exc:
+            if retries == 0:
+                return str(exc)
+            retries -= 1
+            time.sleep(0.5)
+
+
+def redis_set(key, value):
+    retries = 5 
+    while True:
+        try:
+            return redis.set(key, value) 
         except Exception as exc:
             if retries == 0:
                 return str(exc)
