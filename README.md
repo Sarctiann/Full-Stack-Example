@@ -23,7 +23,6 @@
 
     Here you can inspect the json coming from backend. To check if data comes from mysql or redis.
 
-*
 ---
 
 ### considerations to be care
