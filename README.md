@@ -1,14 +1,29 @@
 # test-project
-##### comparaencasa
+#### DOCKER + REACT + FLASK + MYSQL + REDIS
+##### *comparaencasa*
 
-1. ## To RUN the project just type: ```docker-compose up``` on the terminal
+---
+1. ## To RUN the project just type: ```docker-compose up -d``` on the terminal
 
-1. ### Then, you must inizialize the database table cars and load the test data set go to URI: ```localhost:5000/initialize```.
+1. ### Then, you must inizialize the database table cars and load the test data set go to URI: ```http://localhost:5000/initialize```.
     You might change the data set on the file ```backend/src/test_data/TEST_DATA.csv``` and run "initialize" again.
     > (Note that plate was defined as UNIQUE field so if the records already exist in the table they will not be reloaded naturally)
 
 1. ## Now, go to http://localhost:3000
 
+1. ## Finally, to stop all, type: ``docker-compose down -v```
+
+---
+
+### You can do some checks on ```http://localhost:5000```
+* ```/mysql_instance``` -> Shows the actuals databases and tables on test_project database
+* ```/get_car?plate=xxxnnn``` -> This is the endpoint for the frontend. 
+    
+    (For dimplicity, this example do not follows the convention of ```/api/Vn/...``` wrapper)
+
+    Here you can inspect the json coming from backend. To check if data comes from mysql or redis.
+
+*
 ---
 
 ### considerations to be care
