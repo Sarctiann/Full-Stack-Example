@@ -1,18 +1,20 @@
 # test-project
 ##### comparaencasa
 
-1. ## To RUN the project just type: ```sh docker-compose up``` on the terminal
+1. ## To RUN the project just type: ```docker-compose up``` on the terminal
 
 1. ### Then, you must inizialize the database table cars and load the test data set go to URI: ```localhost:5000/initialize```.
     You might change the data set on the file ```backend/src/test_data/TEST_DATA.csv``` and run "initialize" again.
     > (Note that plate was defined as UNIQUE field so if the records already exist in the table they will not be reloaded naturally)
 
-1. ## To be continue ...
+1. ## Now, go to http://localhost:3000
 
 ---
 
 ### considerations to be care
 
+* To avoid installing node_modules related to "react", I took a different approach, doing the ```npm run build``` before the image build. So when I copy the frontend files I only use the build directory really.
+* Thus, if you make any change in the frontend you'll need to run npm build, and delete the front_react image to rebuild it.
 * To be able to use "flask-mysql-db" we need to install some extra APKs in ours image
 * mysql python connector use "unix sockets" instead of "TCP"
 

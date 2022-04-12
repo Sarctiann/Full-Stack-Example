@@ -4,10 +4,8 @@
 """
 
 import csv
-import time
 
 from src.query_funcs import query
-
 
 
 def load_data():

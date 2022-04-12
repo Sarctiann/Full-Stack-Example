@@ -1,8 +1,10 @@
+
+
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 from src.extensions import mysql, redis
-from src.query_funcs import query
+from src.query_funcs import query, redis_get, redis_set
 from src.test_data.upload_test_data import load_data
 
 
@@ -25,18 +27,36 @@ CORS(app)
     that would normally be used in a Flask project.
 """
 
+
 @app.route('/get_car')
 def index():
     plate = request.args.get('plate')
     res = {}
     if plate:
-        rowcount, (carmatch, *_) = query('get_car', (plate,))
-        if rowcount:
+        if car:= redis_get(plate):
             res['car'] = {
-                'id': carmatch[0],
-                'plate': carmatch[1],
-                'name': carmatch[2]
+                'id': car[0],
+                'plate': car[1],
+                'model': car[2],
+                'from': 'redis'
             }
+        else:
+            rowcount, carmatch = query('get_car', (plate,))
+            if rowcount:
+                car, *_ = carmatch
+                res['car'] = {
+                    'id': car[0],
+                    'plate': car[1],
+                    'model': car[2],
+                    'from': 'mysql'
+                }
+                redis_set(plate, car)
+            else:
+                res.update({
+                    'warning':
+                    f"The plate {plate} doesn't correspond to any car"
+                })
+
     return jsonify(res)
 
 
@@ -54,9 +74,11 @@ def dbs():
     return jsonify(res)
 
 
-# SERVE FRONTEND
 @app.route('/')                         # CATCH ALL ROUTES
-@app.errorhandler(404)                  # ENABLE RACT ROUTES
-def serve(_=None):
+@app.errorhandler(404)
+def not_found(_=None):
     # Discart error
-    return '<h1> No found for now</h1>'
+    return jsonify({
+        'error 404':
+            "this resource don't exists. take a look at the endpoint you need"
+    })

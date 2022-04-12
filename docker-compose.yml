@@ -5,27 +5,41 @@ version: '3.9'
 
 # Configuration for the services (back and redis)
 services:
+
   # This service builds the app from the Dockerfile
+  react:
+    # Give a name to the container.
+    container_name: front_react
+    # Build from Dockerfile inside frontend directory.
+    build: ./frontend
+    # Bind host:container port
+    ports:
+      - 3000:3000
+    # Add current dir as volume, and copy it to code dir
+    volumes:
+      - ./frontend:/code/frontend
+    # Run backend first and its dependencies
+    depends_on:
+      - flask
+
+  # This is the backend part
   flask:
     container_name: back_flask
-    # Current Dir
-    build: .
+    build: ./backend
     # Extra environment variable
     environment:
       FLASK_ENV: development
-    # Bind host:container port
     ports:
       - 5000:5000
-    # Add current dir as volume, and copy it to code dir
     volumes:
-      - .:/code
+      - ./backend:/code/backend
       - mysql_db_sock:/run/mysqld
-    # Run Redis ans MySQL first
+    # Run Redis and MySQL first
     depends_on:
       - mysql
       - redis
 
-  # Now the sevices
+  # Now the MySQL sevice
   mysql:
     container_name: back_mysql
     image: mysql:8
@@ -36,13 +50,16 @@ services:
     ports:
       - 3306:3306
     volumes:
+      # Specify with "./" to replicate "mysql_db" on local directory
       - ./mysql_db:/var/lib/mysql:rw
       - mysql_db_sock:/var/run/mysqld
 
+  # Finally, the Redis service
   redis:
     container_name: back_redis
     image: redis:alpine
 
+# Persist volume mysql_db and link mysql_db_sock to allows python connection
 volumes:
   mysql_db: {}
   mysql_db_sock:

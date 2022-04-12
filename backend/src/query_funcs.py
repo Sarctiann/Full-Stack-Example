@@ -1,6 +1,7 @@
 """ This module contains the funtions to interact with sql and redis """
 
 import time
+import pickle as pk
 
 from src.extensions import mysql, redis
 
@@ -47,7 +48,10 @@ def redis_get(key):
     retries = 5 
     while True:
         try:
-            return redis.get(key)
+            pk_value = redis.get(key)
+            if pk_value:
+                return pk.loads(pk_value)
+            return None
         except Exception as exc:
             if retries == 0:
                 return str(exc)
@@ -59,7 +63,7 @@ def redis_set(key, value):
     retries = 5 
     while True:
         try:
-            return redis.set(key, value) 
+            return redis.set(key, pk.dumps(value)) 
         except Exception as exc:
             if retries == 0:
                 return str(exc)

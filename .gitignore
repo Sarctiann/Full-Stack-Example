@@ -1,8 +1,12 @@
 # Folders
 
+.vscode/
+
 __pycache__/
 
 mysql_db/
+
+node_modules/
 
 # Files
 
